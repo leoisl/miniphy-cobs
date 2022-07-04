@@ -20,7 +20,7 @@ see [sample_data/ordering](sample_data/ordering) for one example;
 * `assemblies_dir`: a directory containing assemblies. This directory can be subdivided in batches.
 See [sample_data/assemblies](sample_data/assemblies) for one example;
 * `output_dir`: the output dir;
-* `cobs_container`: the `COBS` container to use, can be used to specify a version of `COBS`.
+* `cobs_executable_path`: the `COBS` executable path.
 
 ## Running
 
