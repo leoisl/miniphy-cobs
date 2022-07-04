@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eux
 
-MEMORY=8000
+MEMORY=2000
 LOG_DIR=logs/
 JOB_NAME="snakemake_master_process."$(date --iso-8601='minutes')
 PROFILE="lsf"
