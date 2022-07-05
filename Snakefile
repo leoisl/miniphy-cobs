@@ -4,6 +4,7 @@ import json
 import random
 import string
 import os
+import hashlib
 
 configfile: "config.yaml"
 
@@ -77,8 +78,10 @@ rule build_sample_name_to_assembly_path:
 def reorder_genomes(sample_name_to_assembly_path, order, output_dir):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=False)
-    hash_order = hash(tuple(order))
-    random.seed(hash_order)
+    order_as_str = "".join(order).encode("utf-8")
+    sha1_hex = hashlib.sha1(order_as_str).hexdigest()
+    sha1_hex_as_int = int(sha1_hex, 16)
+    random.seed(sha1_hex_as_int)
     random_names = get_n_random_sorted_names(len(order))
     for sample_name, random_name in zip(order, random_names):
         source = Path(sample_name_to_assembly_path[sample_name])
