@@ -71,13 +71,13 @@ cd 661k_orderings && tar -xvf 661k_phylogenetically_ordered_high_quality.tar.xz
 
 ```
 wget http://ftp.ebi.ac.uk/pub/databases/ENA2018-bacteria-661k/661_assemblies.tar
-tar -xvf 661_assemblies.tar
+tar -xvf 661_assemblies.tar  # will be extracted to dir Assemblies
 ```
 
 3. Edit `config.yaml` to point to these directories:
 ```
 ordering_dir: 661k_orderings/661k_phylogenetically_ordered_high_quality
-assemblies_dir: 661_assemblies
+assemblies_dir: Assemblies
 ```
 Don't forget to configure your output dir and `COBS` executable.
 
