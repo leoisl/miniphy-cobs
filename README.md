@@ -61,8 +61,8 @@ These were the indexes we used in the paper's [mof-search][1], and you can repro
 just want the indexes, you can download them from [TODO: add Zenodo link](zenodo) or just run `make download` in
 [mof-search][1] root.
 
-1. Decompress the 661k high quality ordering (the 661k full ordering is also available in
-`661k_orderings/661k_phylogenetically_ordered.tar.xz`. You can also create your own ordering):
+1. Decompress the 661k high quality ordering (the 661k full ordering is also available [here](661k_orderings/661k_phylogenetically_ordered.tar.xz)).
+You can also create your own ordering):
 ```
 cd 661k_orderings && tar -xvf 661k_phylogenetically_ordered_high_quality.tar.xz
 ```
