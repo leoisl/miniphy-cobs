@@ -1,7 +1,7 @@
-# mof_compressor
+# mof-cobs-build
 
 Creates and compresses ordered [COBS](https://github.com/iqbal-lab-org/cobs) indexes to later be used by
-[mof-search](https://github.com/karel-brinda/mof-search).
+[mof-search][1].
 
 # Dependencies
 
