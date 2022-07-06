@@ -55,3 +55,30 @@ bash run_local.sh
 
 and take a look at the output files in `sample_data/out`.
 
+## Creating compressed `COBS` indexes for the 661k high quality genomes
+
+These were the indexes we used in the paper's [mof-search][1], and you can reproduce them as described below. If you
+just want the indexes, you can download them from [TODO: add Zenodo link](zenodo) or just run `make download` in
+[mof-search][1] root.
+
+1. Decompress the 661k high quality ordering (the 661k full ordering is also available in
+`661k_orderings/661k_phylogenetically_ordered.tar.xz`. You can also create your own ordering):
+```
+cd 661k_orderings && tar -xvf 661k_phylogenetically_ordered_high_quality.tar.xz
+```
+
+2. Download the original 661k assemblies:
+
+```
+wget http://ftp.ebi.ac.uk/pub/databases/ENA2018-bacteria-661k/661_assemblies.tar
+tar -xvf 661_assemblies.tar
+```
+
+3. Edit `config.yaml` to point to these directories:
+```
+ordering_dir: 661k_orderings/661k_phylogenetically_ordered_high_quality
+assemblies_dir: 661_assemblies
+```
+Don't forget to configure your output dir and `COBS` executable.
+
+[1]: https://github.com/karel-brinda/mof-search
