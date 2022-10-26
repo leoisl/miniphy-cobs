@@ -159,9 +159,9 @@ rule run_COBS:
         reordered_assembly_dir = rules.reorder_genomes.output.reordered_assemblies_dir
     output:
         COBS_out_dir = directory(f"{config['output_dir']}/COBS_out/{{order_name}}")
-    threads: 8
+    threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 16000
+        mem_mb=lambda wildcards, attempt: attempt * 4000
     log:
         "logs/run_COBS_{order_name}.log"
     conda: "envs/cobs.yaml"
@@ -179,7 +179,7 @@ rule compress_COBS_index:
         COBS_index = lambda wildcards: f"{config['output_dir']}/COBS_out/{wildcards.order_name}/{wildcards.order_name}.cobs_classic"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 24000
+        mem_mb=lambda wildcards, attempt: attempt * 4000
     log:
         "logs/compress_COBS_index_{order_name}.log"
     shell:
