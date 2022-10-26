@@ -1,4 +1,4 @@
 ordering_dir: sample_data/ordering
 assemblies_dir: sample_data/assemblies
+batch_size: 400
 output_dir: sample_data/out
-cobs_executable_path: "cobs"

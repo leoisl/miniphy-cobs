@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 set -eux
-snakemake -j4
+snakemake --use-conda -j1 -- create_new_batches
+snakemake --use-conda -j1

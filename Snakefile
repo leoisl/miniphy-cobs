@@ -12,7 +12,7 @@ configfile: "config.yaml"
 # Helper functions
 # ======================================================
 def find_all_files_recursively(dir, pattern):
-    return (Path(file) for file in glob(f"{dir}/**/{pattern}", recursive=True))
+    return [Path(file) for file in glob(f"{dir}/**/{pattern}", recursive=True)]
 
 def get_all_ordering_files(ordering_dir):
     return find_all_files_recursively(ordering_dir, "*.txt")
@@ -58,6 +58,53 @@ rule all:
         f"{config['output_dir']}/compressed_indexes/all.cobs_classic.xz.tar"
 
 
+rule create_new_batches:
+    input:
+        config["output_dir"] + "/new_batches"
+
+
+rule rebatch:
+    input:
+        all_ordering_files = get_all_ordering_files(config["ordering_dir"])
+    output:
+        new_batches_dir = directory(config["output_dir"] + "/new_batches")
+    threads: 1
+    resources:
+        mem_mb=1000
+    params:
+        batch_size = config["batch_size"]
+    run:
+        import re
+        from collections import defaultdict
+
+        new_batches_dir = Path(output.new_batches_dir)
+        new_batches_dir.mkdir()
+
+        species_to_original_batch_paths = defaultdict(list)
+        for ordering_file in input.all_ordering_files:
+            ordering_file = Path(ordering_file)
+            species = re.findall("(.+)__\d\d\.txt", ordering_file.name)[0]
+            species_to_original_batch_paths[species].append(ordering_file)
+
+        for species, original_batch_paths in species_to_original_batch_paths.items():
+            original_batch_paths_parent = original_batch_paths[0].parent
+            original_batch_paths_template = str(original_batch_paths_parent / species)
+            genome_list = []
+            for batch_number in range(1, len(original_batch_paths)+1):
+                batch_path = original_batch_paths_template + f'__{batch_number:02d}.txt'
+                print(batch_path)
+                genomes_in_batch = list(filter(lambda line: line.strip() != "",
+                    Path(batch_path).read_text().split("\n")))
+                genome_list.extend(genomes_in_batch)
+
+            file_index = 1
+            for start_index in range(0, len(genome_list), params.batch_size):
+                genomes_to_output = genome_list[start_index : start_index+params.batch_size]
+                new_batch_path = new_batches_dir / f"{species}__{file_index:05d}.txt"
+                new_batch_path.write_text("\n".join(genomes_to_output)+"\n")
+                file_index += 1
+
+
 rule build_sample_name_to_assembly_path:
     input:
         assemblies_dir = config['assemblies_dir']
@@ -89,9 +136,10 @@ def reorder_genomes(sample_name_to_assembly_path, order, output_dir):
         dest = output_dir.resolve() / f"{random_name}_{sample_name}{source_suffixes}"
         os.symlink(str(source), str(dest))
 
+
 rule reorder_genomes:
     input:
-        order_file = lambda wildcards: get_order_name_to_order_path(get_all_ordering_files(config['ordering_dir']))[wildcards.order_name],
+        order_file = lambda wildcards: get_order_name_to_order_path(get_all_ordering_files(config["output_dir"] + "/new_batches"))[wildcards.order_name],
         sample_name_to_assembly_path_json = rules.build_sample_name_to_assembly_path.output.sample_name_to_assembly_path_json
     output:
         reordered_assemblies_dir = directory(f"{config['output_dir']}/reordered_assemblies/{{order_name}}")
@@ -117,10 +165,9 @@ rule run_COBS:
         mem_mb=lambda wildcards, attempt: attempt * 16000
     log:
         "logs/run_COBS_{order_name}.log"
-    params:
-        cobs_executable = config['cobs_executable_path']
+    conda: "envs/cobs.yaml"
     shell:
-        "{params.cobs_executable} classic-construct -T {threads} {input.reordered_assembly_dir} "
+        "cobs classic-construct -T {threads} {input.reordered_assembly_dir} "
         "{output.COBS_out_dir}/{wildcards.order_name}.cobs_classic >{log} 2>&1"
 
 
@@ -144,7 +191,7 @@ rule compress_COBS_index:
 rule combine_all_indexes:
     input:
         COBS_compressed_indexes = expand(f"{config['output_dir']}/compressed_indexes/{{order_name}}.cobs_classic.xz",
-                                         order_name=get_order_name_to_order_path(get_all_ordering_files(config['ordering_dir'])))
+                                         order_name=get_order_name_to_order_path(get_all_ordering_files(config["output_dir"] + "/new_batches")))
     output:
         COBS_combined_compressed_index = f"{config['output_dir']}/compressed_indexes/all.cobs_classic.xz.tar"
     threads: 1
