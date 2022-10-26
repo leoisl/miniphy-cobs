@@ -136,7 +136,7 @@ rule compress_COBS_index:
     log:
         "logs/compress_COBS_index_{order_name}.log"
     shell:
-        "xz -9 -T{threads} -e -k -c --lzma2=preset=9,dict=1500MiB,nice=250 {params.COBS_index} " \
+        "xz -9 -T{threads} -e -k -c --lzma2=preset=9,dict=64MiB,nice=250 {params.COBS_index} " \
         ">{output.COBS_compressed_index} 2>{log}"
 
 
