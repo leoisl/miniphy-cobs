@@ -92,7 +92,6 @@ rule rebatch:
             genome_list = []
             for batch_number in range(1, len(original_batch_paths)+1):
                 batch_path = original_batch_paths_template + f'__{batch_number:02d}.txt'
-                print(batch_path)
                 genomes_in_batch = list(filter(lambda line: line.strip() != "",
                     Path(batch_path).read_text().split("\n")))
                 genome_list.extend(genomes_in_batch)
