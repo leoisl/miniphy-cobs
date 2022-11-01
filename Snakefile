@@ -117,10 +117,9 @@ rule run_COBS:
         mem_mb=lambda wildcards, attempt: attempt * 16000
     log:
         "logs/run_COBS_{order_name}.log"
-    params:
-        cobs_executable = config['cobs_executable_path']
+    conda: "envs/cobs.yaml"
     shell:
-        "{params.cobs_executable} classic-construct -T {threads} {input.reordered_assembly_dir} "
+        "cobs classic-construct -T {threads} {input.reordered_assembly_dir} "
         "{output.COBS_out_dir}/{wildcards.order_name}.cobs_classic >{log} 2>&1"
 
 

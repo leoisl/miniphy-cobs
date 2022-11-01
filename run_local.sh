@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 set -eux
-snakemake -j4
+snakemake -j4 --use-conda
