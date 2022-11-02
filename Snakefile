@@ -55,7 +55,9 @@ def get_n_random_sorted_names(n):
 # ======================================================
 rule all:
     input:
-        f"{config['output_dir']}/compressed_indexes/all.cobs_classic.xz.tar"
+        f"{config['output_dir']}/compressed_indexes/all.cobs_classic.xz.tar",
+        expand(f"{config['output_dir']}/asms_out/{{order_name}}.tar.xz",
+        order_name=get_order_name_to_order_path(get_all_ordering_files(config["output_dir"] + "/new_batches")))
 
 
 rule create_new_batches:
@@ -152,6 +154,36 @@ rule reorder_genomes:
             sample_name_to_assembly_path = json.load(json_fh)
         order = get_order(input.order_file)
         reorder_genomes(sample_name_to_assembly_path, order, output.reordered_assemblies_dir)
+
+
+rule rebatch_assemblies:
+    input:
+        reordered_assembly_dir = rules.reorder_genomes.output.reordered_assemblies_dir
+    output:
+        compressed_assembly = f"{config['output_dir']}/asms_out/{{order_name}}.tar.xz"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1000
+    params:
+        tar_file = lambda wildcards: f"{config['output_dir']}/asms_out/{wildcards.order_name}.tar",
+        temp_dir = f"{config['output_dir']}/asms_out/temp"
+    shell:
+        """
+        mkdir -p {params.temp_dir}
+
+        for compressed_assembly in {input.reordered_assembly_dir}/*.contigs.fa.gz
+        do
+            gunzip $compressed_assembly --keep
+            assembly=${compressed_assembly::-3}
+            mv $assembly {params.temp_dir}
+        done
+        
+        tar -cf {params.tar_file} {params.temp_dir}
+        xz -9 -T1 -e -k -c --lzma2=preset=9,dict=64MiB,nice=250 {params.tar_file} > {output.compressed_assembly}
+        
+        rm -v {params.tar_file}
+        rm -rfv {params.temp_dir}
+        """
 
 
 rule run_COBS:
