@@ -166,10 +166,9 @@ rule rebatch_assemblies:
         mem_mb=lambda wildcards, attempt: attempt * 1000
     params:
         tar_file = lambda wildcards: f"{config['output_dir']}/asms_out/{wildcards.order_name}.tar",
-        temp_dir = f"{config['output_dir']}/asms_out/temp"
+        temp_dir = lambda wildcards: f"{config['output_dir']}/asms_out/{wildcards.order_name}/temp"
     shell:
         """
-        set -x
         mkdir -p {params.temp_dir}
 
         for compressed_assembly in {input.reordered_assembly_dir}/*.contigs.fa.gz
