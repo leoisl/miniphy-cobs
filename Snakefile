@@ -169,12 +169,13 @@ rule rebatch_assemblies:
         temp_dir = f"{config['output_dir']}/asms_out/temp"
     shell:
         """
+        set -x
         mkdir -p {params.temp_dir}
 
         for compressed_assembly in {input.reordered_assembly_dir}/*.contigs.fa.gz
         do
             gunzip $compressed_assembly --keep
-            assembly=${compressed_assembly::-3}
+            assembly=${{compressed_assembly::-3}}
             mv $assembly {params.temp_dir}
         done
         
