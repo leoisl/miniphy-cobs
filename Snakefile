@@ -173,8 +173,8 @@ rule rebatch_assemblies:
 
         for compressed_assembly in {input.reordered_assembly_dir}/*.contigs.fa.gz
         do
-            gunzip $compressed_assembly --keep
             assembly=${{compressed_assembly::-3}}
+            gunzip $compressed_assembly --keep --force --stdout > $assembly
             mv $assembly {params.temp_dir}
         done
         
