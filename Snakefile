@@ -165,8 +165,7 @@ rule rebatch_assemblies:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1000
     params:
-        tar_file = lambda wildcards: f"{config['output_dir']}/asms_out/{wildcards.order_name}.tar",
-        temp_dir = lambda wildcards: f"{config['output_dir']}/asms_out/{wildcards.order_name}/temp"
+        temp_dir = lambda wildcards: f"{config['output_dir']}/asms_out/{wildcards.order_name}/temp/{wildcards.order_name}"
     shell:
         """
         mkdir -p {params.temp_dir}
@@ -179,11 +178,11 @@ rule rebatch_assemblies:
             mv $assembly {params.temp_dir}
         done
         
-        tar -cf {params.tar_file} {params.temp_dir}
-        xz -9 -T1 -e -k -c --lzma2=preset=9,dict=64MiB,nice=250 {params.tar_file} > {output.compressed_assembly}
-        
-        rm -v {params.tar_file}
-        rm -rfv {params.temp_dir}
+        cd {params.temp_dir}/..
+        tar -cf {wildcards.order_name}.tar {wildcards.order_name}
+        xz -9 -T1 -e -k -c --lzma2=preset=9,dict=64MiB,nice=250 {wildcards.order_name}.tar > ../../{wildcards.order_name}.tar.xz
+        cd ../
+        rm -rfv temp
         """
 
 
