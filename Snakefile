@@ -197,8 +197,10 @@ rule run_COBS:
     log:
         "logs/run_COBS_{order_name}.log"
     conda: "envs/cobs.yaml"
+    params:
+        kmer_size = config["COBS_kmer_size"]
     shell:
-        "cobs classic-construct -T {threads} {input.reordered_assembly_dir} "
+        "cobs classic-construct -T {threads} -k {params.kmer_size} {input.reordered_assembly_dir} "
         "{output.COBS_out_dir}/{wildcards.order_name}.cobs_classic >{log} 2>&1"
 
 
