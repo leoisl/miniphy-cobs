@@ -1,3 +1,5 @@
 ordering_dir: sample_data/ordering
 assemblies_dir: sample_data/assemblies
+batch_size: 400
+COBS_kmer_size: 31
 output_dir: sample_data/out
