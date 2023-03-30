@@ -107,9 +107,34 @@ rule reorder_genomes:
         reorder_genomes(sample_name_to_assembly_path, order, output.reordered_assemblies_dir)
 
 
-rule run_COBS:
+rule minimize_genomes:
     input:
         reordered_assembly_dir = rules.reorder_genomes.output.reordered_assemblies_dir
+    output:
+        minimize_genome_dir = directory(f"{config['output_dir']}/minimized_genomes/{{order_name}}")
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 2000
+    log:
+        "logs/minimize_genomes/{order_name}.log"
+    params:
+        kmer_size = config["kmer_size"],
+        window_size = config["window_size"],
+        custom_minimap = config["custom_minimap"]
+    shell:
+        """
+        mkdir -p {output.minimize_genome_dir}
+        for genome in $(ls {input.reordered_assembly_dir}/*.contigs.fa.gz)
+        do
+            genome_name=$(basename $genome)
+            {params.custom_minimap} $genome -k {params.kmer_size} -w {params.window_size} -d /dev/null -t 1 2>/dev/null | gzip > {output.minimize_genome_dir}/$genome_name.minimizers.fa.gz
+        done
+        """
+
+
+rule run_COBS:
+    input:
+        minimize_genome_dir = rules.minimize_genomes.output.minimize_genome_dir
     output:
         COBS_out_dir = directory(f"{config['output_dir']}/COBS_out/{{order_name}}")
     threads: 8
@@ -119,9 +144,9 @@ rule run_COBS:
         "logs/run_COBS_{order_name}.log"
     conda: "envs/cobs.yaml"
     params:
-        kmer_size = config["COBS_kmer_size"]
+        kmer_size = config["kmer_size"]
     shell:
-        "cobs classic-construct -T {threads} -k {params.kmer_size} {input.reordered_assembly_dir} "
+        "cobs classic-construct -T {threads} -k {params.kmer_size} {input.minimize_genome_dir} "
         "{output.COBS_out_dir}/{wildcards.order_name}.cobs_classic >{log} 2>&1"
 
 

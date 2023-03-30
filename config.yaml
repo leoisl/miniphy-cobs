@@ -1,4 +1,6 @@
 ordering_dir: sample_data/ordering
 assemblies_dir: sample_data/assemblies
-COBS_kmer_size: 31
+kmer_size: 21
+window_size: 11
+custom_minimap: envs/minimap2
 output_dir: sample_data/out
