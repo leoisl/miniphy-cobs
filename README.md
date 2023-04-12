@@ -38,7 +38,7 @@ bash run_local.sh
 Please have the [LSF profile](https://github.com/Snakemake-Profiles/lsf) installed and run:
 
 ```
-bash run_local.sh
+bash submit_lsf.sh
 ```
 
 ## Output
