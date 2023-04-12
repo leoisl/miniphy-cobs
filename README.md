@@ -7,6 +7,7 @@ Creates and compresses ordered [COBS](https://github.com/iqbal-lab-org/cobs) ind
 
 * `python 3.7+`;
 * `snakemake`;
+* `conda`/`mamba`;
 * `xz`;
 * `tar`;
 
@@ -19,8 +20,8 @@ Just configure the four entries in [config.yaml](config.yaml):
 see [sample_data/ordering](sample_data/ordering) for one example;
 * `assemblies_dir`: a directory containing assemblies. This directory can be subdivided in batches.
 See [sample_data/assemblies](sample_data/assemblies) for one example;
+* `COBS_kmer_size`: the kmer size to be used when running `COBS`;
 * `output_dir`: the output dir;
-* `cobs_executable_path`: the `COBS` executable path.
 
 ## Running
 
@@ -58,8 +59,9 @@ and take a look at the output files in `sample_data/out`.
 ## Creating compressed `COBS` indexes for the 661k high quality genomes
 
 These were the indexes we used in the paper's [mof-search][1], and you can reproduce them as described below. If you
-just want the indexes, you can download them from [TODO: add Zenodo link](zenodo) or just run `make download` in
-[mof-search][1] root.
+just want the indexes, you can download them from 
+https://zenodo.org/record/6845083 and https://zenodo.org/record/6849657
+or just run `make download` in [mof-search][1] root.
 
 1. Decompress the 661k high quality ordering (the 661k full ordering is also available [here](661k_orderings/661k_phylogenetically_ordered.tar.xz)).
 You can also create your own ordering):
@@ -79,6 +81,6 @@ tar -xvf 661_assemblies.tar  # will be extracted to dir Assemblies
 ordering_dir: 661k_orderings/661k_phylogenetically_ordered_high_quality
 assemblies_dir: Assemblies
 ```
-Don't forget to configure your output dir and `COBS` executable.
+Don't forget to configure your `COBS` kmer size and output dir.
 
 [1]: https://github.com/karel-brinda/mof-search
