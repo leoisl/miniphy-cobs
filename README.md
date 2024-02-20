@@ -1,4 +1,4 @@
-# mof-cobs-build
+# miniphy-cobs
 
 Creates and compresses ordered [COBS](https://github.com/iqbal-lab-org/cobs) indexes to later be used by
 [mof-search][1].
